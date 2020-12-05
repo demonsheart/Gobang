@@ -14,18 +14,16 @@ createChess();
 
 //初始化游戏基础信息
 var fiveChess = [{
-    name: '黑子',
-    color: '#111'
+    name: '黑子'
 }, {
-    name: '白子',
-    color: '#eee'
+    name: '白子'
 }];
 var chess = 0; //当前棋手
 var chess_rec = []; //游戏坐标记录
 
 
 //向画布添加点击事件(DOM事件)
-canv.addEventListener('click', function (ev) {
+canv.addEventListener('click', function(ev) {
     if (over)
         return;
     //获取点击事件的坐标,并修正坐标
@@ -68,14 +66,23 @@ function createChess() {
  * 绘制棋子
  * @param x     棋子x轴位置
  * @param y     棋子y轴位置
- * @param color    棋子颜色
  */
 function setChess(x, y, color) {
     ctx.save();
     ctx.beginPath();
-    ctx.fillStyle = color;
     ctx.arc(x, y, 25, 0, 2 * Math.PI);
+    var chessstyle = ctx.createRadialGradient(x, y, 25, x, y, 1);
+    /* chesstype true 为黑子*/
+    if (chess == 0) {
+        chessstyle.addColorStop(0, "#0A0A0A");
+        chessstyle.addColorStop(1, "#636766");
+    } else {
+        chessstyle.addColorStop(0, "#D1D1D1");
+        chessstyle.addColorStop(1, "#F9F9F9");
+    }
+    ctx.fillStyle = chessstyle;
     ctx.fill();
+    ctx.closePath();
     ctx.restore();
 }
 

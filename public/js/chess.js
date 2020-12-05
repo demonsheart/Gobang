@@ -1,4 +1,3 @@
-/* Your custom javascript code */
 /**
  * UI
  * @author C1101
@@ -8,23 +7,33 @@
 //获取绘画接口
 var canv = document.getElementById('mycanv');
 var ctx = canv.getContext('2d');
-var over = false;
+var over = false; //游戏是否结束
+var player = 0; //当前棋手 0代表玩家 1代表电脑
+var chessBoard = []; //游戏坐标记录 玩家下棋置1 电脑下棋置2
+var myWin = []; //玩家赢法数组
+var aiWin = []; //电脑赢法数组
+
 
 //绘制棋盘
-createChess();
+createChessBoard();
 
-//初始化游戏基础信息
-var fiveChess = [{
-    name: '黑子'
-}, {
-    name: '白子'
-}];
-var chess = 0; //当前棋手
-var chess_rec = []; //游戏坐标记录
+// 初始化棋盘信息
+for (var i = 0; i < 15; i++) {
+    chessBoard[i] = [];
+    for (var j = 0; j < 15; j++) {
+        chessBoard[i][j] = 0;
+    }
+}
 
 
-//向画布添加点击事件(DOM事件)
-canv.addEventListener('click', function(ev) {
+
+
+/*
+以下是函数区域
+*/
+
+//玩家回合
+canv.addEventListener('click', function(ev) { //向画布添加点击事件(DOM事件)
     if (over)
         return;
     //获取点击事件的坐标,并修正坐标
@@ -33,13 +42,22 @@ canv.addEventListener('click', function(ev) {
         y = Math.round(ev.offsetY / 50);
 
     //边框修正 重复值修正
-    if (x * y > 0 && x < 16 && y < 16 && !chess_rec.includes(x + '-' + y)) {
-        chess_rec.push(x + '-' + y); //记录
-        // console.log(getwins_5(x, y));
-        setChess(x * 50, y * 50, fiveChess[chess].color); //显示
-        if (chess_rec.length > 8)
-            checkOver(x, y, chess); //判断输赢
-        chess ^= 1; //交换棋手
+    if (x * y > 0 && x < 16 && y < 16 && chessBoard[y - 1][x - 1] == 0) {
+        //玩家下棋 置1
+        chessBoard[y - 1][x - 1] = 1; //记录 由于canvans画布与数组的x,y差一并且颠倒 故修正
+        playChess(x * 50, y * 50, player); //显示
+
+        //判断输赢
+        if (ifPlayerWin()) {
+            over = true;
+            window.alert("Congratulations! Player Win!")
+        }
+
+        if (!over) {
+            player ^= 1; //交换棋手
+            //电脑下棋
+            aiGo();
+        }
     }
 
 })
@@ -48,7 +66,7 @@ canv.addEventListener('click', function(ev) {
 /**
  * 绘制棋盘 15 * 15
  */
-function createChess() {
+function createChessBoard() {
     for (let i = 1; i <= 15; ++i) {
         //竖线
         ctx.beginPath();
@@ -67,14 +85,15 @@ function createChess() {
  * 绘制棋子
  * @param x     棋子x轴位置
  * @param y     棋子y轴位置
+ * @param c     bool类型,用来区别玩家，显示不同颜色棋子
  */
-function setChess(x, y, color) {
+function playChess(x, y, c) {
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, 25, 0, 2 * Math.PI);
     var chessstyle = ctx.createRadialGradient(x, y, 25, x, y, 1);
     /* chesstype true 为黑子*/
-    if (chess == 0) {
+    if (c == 0) {
         chessstyle.addColorStop(0, "#0A0A0A");
         chessstyle.addColorStop(1, "#636766");
     } else {
@@ -88,70 +107,32 @@ function setChess(x, y, color) {
 }
 
 /**
- * 九连数组
- * @param x     棋子x轴位置
- * @param y     棋子y轴位置
+ * AI回合
  */
-function getwins_9(x, y) {
-    var wins = [
-        [],
-        [],
-        [],
-        []
-    ];
-    for (let i = -4; i <= 4; ++i) {
-        let rg1 = x + i > 0 && x + i < 16,
-            rg2 = y + i > 0 && y + i < 16,
-            rg3 = y - i > 0 && y - i < 16;
-        //0°
-        if (rg1)
-            wins[0].push(`${x+i}-${y}`);
-        //90°
-        if (rg2)
-            wins[1].push(`${x}-${y+i}`);
-        //135°
-        if (rg1 && rg2)
-            wins[2].push(`${x+i}-${y+i}`);
-        //45°
-        if (rg1 && rg3)
-            wins[3].push(`${x+i}-${y-i}`);
-    }
-    //array.filter(func);  参数 => 函数体
-    return wins.filter(arr => arr.length >= 5);
+function aiGo() {
+    if (over)
+        return;
+    //寻找最优位置
+
+    //在最优位置下棋：调用playChess()显示 并且置棋盘数组对应位置为2
+
+    //调用ifAIWin()判断电脑是否获胜
+    //如果获胜，输出提示，并置over = true
+    //如果未获胜 交换棋权player ^= 1
 }
 
 /**
- * 五连数组 通过九连数组分割
- * @param x     棋子x轴位置
- * @param y     棋子y轴位置
+ * 判断玩家是否获胜
+ * @returns bool
  */
-function getwins_5(x, y) {
-    var wins = [];
-    //遍历分割即可
-    getwins_9(x, y).forEach(arr => {
-        for (let i = 0; i < arr.length - 4; ++i) {
-            wins.push(arr.slice(i, i + 5));
-        }
-    })
+function ifPlayerWin() {
 
-    return wins;
 }
 
 /**
- * 判断输赢
- * @param x     棋子x轴位置
- * @param y     棋子y轴位置
- * @param chess 棋手
+ * 判断电脑是否获胜
+ * @returns bool
  */
-function checkOver(x, y, chess) {
-    //array.filter(function(currentValue,index,arr), thisValue)
-    let chs = chess_rec.filter((n, i) => i % 2 == chess);
-    let win = getwins_5(x, y).some(arr => arr.every(n => chs.includes(n)));
-    if (win) {
-        //setTimeout(JavaScript 函数, 等待的毫秒数)
-        setTimeout(() => {
-            alert(`恭喜${fiveChess[chess].name}胜利`)
-        }, 10);
-        over = true;
-    }
+function ifAIWin() {
+
 }

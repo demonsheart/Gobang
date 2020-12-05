@@ -11,7 +11,7 @@
     <link href="{{ URL::asset('css/style.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ URL::asset('css/chess.css') }}" rel="stylesheet" type="text/css">
     <!-- SITE TITLE -->
-    <title>Home</title>
+    <title>Gobang</title>
 </head>
 
 <body>

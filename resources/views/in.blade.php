@@ -18,8 +18,8 @@
 
     <!-- AUDIO PLAYER -->
     <audio class="audio-player" autoplay loop>
-	<source src="audio/song.mp3" type="audio/mpeg">
-</audio>
+        <source src="audio/song.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- BACKGROUND CONTAINER -->
     <div class="bg-container snowy">
@@ -47,12 +47,9 @@
                             <h2>Let's play gobang</h2>
                             <canvas id="mycanv" width="800" height="800"></canvas>
                         </div>
-                        <!-- SOCIAL ICONS -->
-                        <ul class="social-icons">
-                            <li><a href="#" title="Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Google+"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Contact"><i class="fa fa-envelope" aria-hidden="true"></i></a></li>
+                        <!-- FUNC -->
+                        <ul class="func">
+                            <li><button id="undo">Undo</button></li>
                         </ul>
                     </div>
                 </div>

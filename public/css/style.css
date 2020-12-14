@@ -16,7 +16,7 @@
  * 13. SNOW BOX COUNTER
  * 14. FULLPAGE
  * 15. AUDIO PLAYER
- * 16. SOCIAL ICONS
+ * 16. FUNC
  * 17. CONTACT FORM
  * 18. ALERTS
 */
@@ -1200,9 +1200,9 @@ screen and (max-height:740px) {
 }
 
 
-/* SOCIAL ICONS */
+/* FUNC */
 
-.social-icons {
+.func {
     padding: 0;
     margin: 7px 0;
     display: inline-block;
@@ -1211,18 +1211,18 @@ screen and (max-height:740px) {
     vertical-align: middle;
 }
 
-.social-icons li {
+.func li {
     margin: 0 10px;
     display: inline-block;
 }
 
-.social-icons li:last-child {
+.func li:last-child {
     padding-right: 0;
 }
 
-.social-icons li a,
-.social-icons li a:link,
-.social-icons li a:visited {
+.func li a,
+.func li a:link,
+.func li a:visited {
     color: #fff;
     font-size: 24px;
     width: 45px;
@@ -1245,19 +1245,50 @@ screen and (max-height:740px) {
     border-radius: 5px;
 }
 
-.social-icons li a:hover,
-.social-icons li a:active {
+.func li a:hover,
+.func li a:active {
+    background-color: #43A6F3;
+    border-color: #43A6F3;
+}
+
+.func li button,
+.func li button:link,
+.func li button:visited {
+    color: #fff;
+    font-size: 24px;
+    width: 90px;
+    height: 45px;
+    text-align: center;
+    line-height: 35px;
+    display: inline-block;
+    border: 2px solid #eee;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    background-color: rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    text-shadow: none;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.func li button:hover,
+.func li button:active {
     background-color: #43A6F3;
     border-color: #43A6F3;
 }
 
 @media (max-width:767px) {
-    .social-icons li {
+    .func li {
         margin: 0 5px;
     }
-    .social-icons li a,
-    .social-icons li a:link,
-    .social-icons li a:visited {
+    .func li a,
+    .func li a:link,
+    .func li a:visited {
         font-size: 21px;
         width: 35px;
         height: 35px;

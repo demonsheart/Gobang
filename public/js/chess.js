@@ -142,7 +142,7 @@ function playChess(x, y, c) {
 function reset(x, y) {
     ctx.save();
     ctx.beginPath();
-    ctx.arc(x, y, 26, 0, 2 * Math.PI);
+    ctx.arc(x, y, 25.5, 0, 2 * Math.PI);
     ctx.fillStyle = "#963";
     ctx.strokeStyle = "#963";
     ctx.fill();

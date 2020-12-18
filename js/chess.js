@@ -156,10 +156,10 @@ function reset(x, y) {
  * @param y     棋子y轴像素位置
  */
 function reset2(x, y) {
-    let x1 = x - 26,
-        x2 = x + 26,
-        y1 = y - 26,
-        y2 = y + 26;
+    let x1 = x - 24.7,
+        x2 = x + 24.7,
+        y1 = y - 24.7,
+        y2 = y + 24.7;
 
     if (x == 1 * 50)
         x1 = x;

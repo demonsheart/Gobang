@@ -4,12 +4,7 @@
 
 ### 程序使用说明
 
-> 1.  项目打包
-> 2.  安装 composer 之后在项目根目录下使用 composer install 命令安装 vendor 目录
-> 3.  Database 目录下必须有 factories、migrations、seeds 目录
-> 4.  必须先配置.env 文件，链接数据库、填写 key（php artisan key:generate）
-> 5.  必须先建表（建议使用 php artisan migrate）
-> 6.  如果第一次建表，则需要先执行 php artisan migrate:install
+> 1. 目前只开发单机版，直接打包下载，浏览器打开index.html即可。
 
 ### 期望实现功能
 

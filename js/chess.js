@@ -6,8 +6,8 @@
 
 //获取绘画接口
 var canv = document.getElementById('mycanv');
-var undo = document.getElementById('undo');
 var ctx = canv.getContext('2d');
+var undo = document.getElementById('undo');
 var over = false; //游戏是否结束
 var player = 0; //当前棋手 0代表玩家 1代表电脑
 var chessBoard = []; //游戏坐标记录 玩家下棋置1 电脑下棋置2
@@ -36,9 +36,12 @@ for (var i = 0; i < 15; i++) {
 
 //默认棋盘数组为 [xx,yy]的集合， 像素点为[x,y]的集合 
 //其中xx = y - 1, yy = x - 1;
-//这样编写是玩家先手
 
-//玩家回合
+//这样编写是玩家先手
+/**
+ * 下棋事件
+ * 添加click事件，使得玩家能够通过鼠标点击下棋
+ */
 canv.addEventListener('click', function(ev) { //向画布添加点击事件(DOM事件)
     if (over)
         return;
@@ -68,7 +71,6 @@ canv.addEventListener('click', function(ev) { //向画布添加点击事件(DOM�
             aiGo();
         }
     }
-
 })
 
 /**
@@ -120,7 +122,7 @@ function playChess(x, y, c) {
     ctx.beginPath();
     ctx.arc(x, y, 25, 0, 2 * Math.PI);
     var chessstyle = ctx.createRadialGradient(x, y, 25, x, y, 1);
-    /* chesstype true 为黑子*/
+    /* c true 为黑子*/
     if (c == 0) {
         chessstyle.addColorStop(0, "#0A0A0A");
         chessstyle.addColorStop(1, "#636766");
@@ -142,6 +144,7 @@ function playChess(x, y, c) {
 function reset(x, y) {
     ctx.save();
     ctx.beginPath();
+    //通过画一个与背景色一样的圆将棋子掩盖
     ctx.arc(x, y, 25.5, 0, 2 * Math.PI);
     ctx.fillStyle = "#963";
     ctx.strokeStyle = "#963";

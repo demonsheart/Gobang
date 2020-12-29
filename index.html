@@ -1,60 +1,62 @@
-﻿<!DOCTYPE HTML>
+﻿<!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <!-- META TAGS -->
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- STYLES -->
-    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="css/fullpage.css" rel="stylesheet" type="text/css">
-    <link href="css/style.css" rel="stylesheet" type="text/css">
-    <link href="css/chess.css" rel="stylesheet" type="text/css">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/fullpage.css" rel="stylesheet" type="text/css" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <link href="css/chess.css" rel="stylesheet" type="text/css" />
     <!-- SITE TITLE -->
     <title>Gobang</title>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <!-- AUDIO PLAYER -->
     <audio class="audio-player" autoplay loop>
-	<source src="audio/song.mp3" type="audio/mpeg">
-</audio>
+      <source src="audio/song.mp3" type="audio/mpeg" />
+    </audio>
 
     <!-- BACKGROUND CONTAINER -->
     <div class="bg-container snowy">
-        <!-- GLASS BALL -->
-        <div class="glass-ball rotate"></div>
-        <!-- TOP LIGHT -->
-        <div class="top-light"></div>
-        <!-- PAGE CONTENT -->
-        <div class="page-content">
-            <div class="fullpage">
-                <!-- HOME SECTION -->
-                <div id="home" class="section active">
-                    <!-- TITLE -->
-                    <h1 class="snow-text">Coming Soon</h1>
-                    <!-- COUNTER -->
-                    <div class="snow-box">
-                        <div class="countdown" data-date="January 1 2021 00:00:00"></div>
-                    </div>
-                </div>
-                <!-- INFO SECTION -->
-                <div id="info" class="section">
-                    <div class="container">
-                        <!-- INFO TEXT -->
-                        <div class="shadow-box">
-                            <h2>Let's play gobang</h2>
-                            <canvas id="mycanv" width="800" height="800"></canvas>
-                        </div>
-                        <!-- FUNC -->
-                        <ul class="func">
-                            <li><button id="undo">Undo</button></li>
-                        </ul>
-                    </div>
-                </div>
+      <!-- GLASS BALL -->
+      <div class="glass-ball rotate"></div>
+      <!-- TOP LIGHT -->
+      <div class="top-light"></div>
+      <!-- PAGE CONTENT -->
+      <div class="page-content">
+        <div class="fullpage">
+          <!-- HOME SECTION -->
+          <div id="home" class="section active">
+            <!-- TITLE -->
+            <h1 class="snow-text">Coming Soon</h1>
+            <!-- COUNTER -->
+            <div class="snow-box">
+              <div
+                class="countdown"
+                data-date="February 12 2021 00:00:00"
+              ></div>
             </div>
+          </div>
+          <!-- INFO SECTION -->
+          <div id="info" class="section">
+            <div class="container">
+              <!-- INFO TEXT -->
+              <div class="shadow-box">
+                <h2>Let's play gobang</h2>
+                <canvas id="mycanv" width="800" height="800"></canvas>
+              </div>
+              <!-- FUNC -->
+              <ul class="func">
+                <li><button id="undo">Undo</button></li>
+                <li><button id="restart">Restart</button></li>
+              </ul>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- SCRIPTS  -->
@@ -65,7 +67,5 @@
     <script type="text/javascript" src="js/snowy.js"></script>
     <script type="text/javascript" src="js/script.js"></script>
     <script type="text/javascript" src="js/chess.js"></script>
-
-</body>
-
+  </body>
 </html>

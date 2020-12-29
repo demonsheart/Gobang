@@ -6,14 +6,19 @@
 
 //获取绘画接口
 var canv = document.getElementById('mycanv');
-var ctx = canv.getContext('2d');
 var undo = document.getElementById('undo');
+var restart = document.getElementById('restart');
+var ctx = canv.getContext('2d');
 var over = false; //游戏是否结束
 var player = 0; //当前棋手 0代表玩家 1代表电脑
 var chessBoard = []; //游戏坐标记录 玩家下棋置1 电脑下棋置2
-var myWin = []; //玩家赢法数组
-var aiWin = []; //电脑赢法数组
 var record = []; //记录数组 记录下棋点的顺序 玩家电脑都要记录
+var record2cp = []; //记录覆盖，用于悔棋
+var record2man = []; //
+var count = 0; //（x，y）在的赢法种类
+var wins = [];
+var manWin = []; //玩家赢法数组
+var computerWin = []; //电脑赢法数组
 
 
 //绘制棋盘
@@ -27,22 +32,59 @@ for (var i = 0; i < 15; i++) {
     }
 }
 
-
-
-
 /*
 以下是函数区域
 */
 
-//默认棋盘数组为 [xx,yy]的集合， 像素点为[x,y]的集合 
+//默认棋盘数组为 [xx,yy]的集合， 像素点为[x,y]的集合
 //其中xx = y - 1, yy = x - 1;
-
 //这样编写是玩家先手
-/**
- * 下棋事件
- * 添加click事件，使得玩家能够通过鼠标点击下棋
- */
-canv.addEventListener('click', function(ev) { //向画布添加点击事件(DOM事件)
+
+//玩家回合
+
+
+for (i = 0; i < 15; i++) { //定义三维数组
+    wins[i] = [];
+    for (j = 0; j < 15; j++) {
+        wins[i][j] = [];
+    }
+}
+
+//横线能赢情况
+for (var x = 0; x < 11; x++) {
+    for (var y = 0; y < 15; y++) {
+        for (var z = 0; z < 5; z++) { //z代表向后5个字
+            //true代表是一种赢法，用count记录下来
+            wins[x + z][y][count] = true; //横向
+            wins[y][x + z][count + 1] = true; //纵向
+        }
+        count += 2; //(x,y)在另一个赢法中
+    }
+}
+
+for (x = 0; x < 11; x++) {
+    //正斜线
+    for (y = 0; y < 11; y++) {
+        for (z = 0; z < 5; z++) {
+            wins[x + z][y + z][count] = true;
+        }
+        count++;
+    }
+    //反斜线
+    for (y = 4; y < 15; y++) {
+        for (z = 0; z < 5; z++) {
+            wins[x + z][y - z][count] = true;
+        }
+        count++;
+    }
+}
+
+for (i = 0; i < count; i++) {
+    manWin[i] = 0;
+    computerWin[i] = 0;
+}
+
+canv.addEventListener('click', function (ev) { //向画布添加点击事件(DOM事件)
     if (over)
         return;
     //获取点击事件的坐标,并修正坐标
@@ -51,44 +93,96 @@ canv.addEventListener('click', function(ev) { //向画布添加点击事件(DOM�
         y = Math.round(ev.offsetY / 50);
 
     //边框修正 重复值修正
-    if (x * y > 0 && x < 16 && y < 16 && chessBoard[y - 1][x - 1] == 0) {
+    if (x * y > 0 && x < 16 && y < 16 && chessBoard[y - 1][x - 1] === 0) {
         let xx = y - 1,
             yy = x - 1; //记录 由于canvans画布与数组的x,y差一并且颠倒 故修正
         //玩家下棋 置1
         chessBoard[xx][yy] = 1;
         record.push([xx, yy]);
-        playChess(x * 50, y * 50, player); //显示
+        playChess(x * 50, y * 50); //显示
 
         //判断输赢
-        if (ifPlayerWin()) {
-            over = true;
-            window.alert("Congratulations! Player Win!")
-        }
+        for (var i = 0; i < count; i++) { //遍历赢法
 
-        if (!over) {
-            player ^= 1; //交换棋手
-            //电脑下棋
-            aiGo();
+            if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数加一
+                manWin[i]++;
+                if (computerWin[i] !== 6) {
+                    record2cp[i] = computerWin[i]; //将电脑的下棋记录中的这个点的值下来，方便悔棋
+                }
+                computerWin[i] = 6; //电脑不可能再用这种赢法获胜了，将其置为非法值
+            }
+            if (manWin[i] === 5) {
+                over = true; //为五，赢了
+                alert("你赢了");
+            }
         }
+        player ^= 1; //交换棋手
+        aiGo();
     }
+
 })
 
 /**
  * 悔棋事件
  */
-undo.addEventListener('click', function() {
+
+undo.addEventListener('click', function () {
     //由于下棋事件中包括了 玩家、电脑 故记录数应是偶数
-    if (record.length > 0) { //目前由于未编写电脑代码 故记录数无上述限制
-        let xy = record.pop();
+    if (record.length > 0) {
+        let xy = record.pop(); //会先将电脑的棋悔掉
         let xx = xy[0],
             yy = xy[1];
         let x = yy + 1,
             y = xx + 1;
+        for (var i = 0; i < count; i++) { //遍历赢法
+
+            if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数减一
+                computerWin[i]--;
+                if (manWin[i] === 6) { //将玩家这个点的记录恢复
+                    manWin[i] = record2man[i];
+                }
+            }
+        }
         chessBoard[xx][yy] = 0; //所在位置置0
         reset(x * 50, y * 50); //悔棋显示
-        player ^= 1;
-    } else {
-        alert("悔棋失败");
+
+
+        xy = record.pop(); //然后将玩家的棋悔掉
+        xx = xy[0];
+        yy = xy[1];
+        x = yy + 1;
+        y = xx + 1;
+        for (i = 0; i < count; i++) { //遍历赢法
+            if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数减一
+                manWin[i]--;
+                if (computerWin[i] === 6) { //将电脑这个点的记录恢复
+                    computerWin[i] = record2cp[i];
+                }
+            }
+        }
+        chessBoard[xx][yy] = 0; //所在位置置0
+        reset(x * 50, y * 50); //悔棋显示
+        over = false;
+    }
+})
+restart.addEventListener('click', function () {
+    canv.height = 800; //清空canv(重新设置高度会重绘画布)
+    createChessBoard(); //重绘
+    record = []; //清空数组
+    record2cp = [];
+    record2man = [];
+    manWin = [];
+    computerWin = [];
+    for (var i = 0; i < 15; i++) {
+        chessBoard[i] = [];
+        for (var j = 0; j < 15; j++) {
+            chessBoard[i][j] = 0;
+        }
+    }
+    over = false;
+    for (i = 0; i < count; i++) { //清空棋盘
+        manWin[i] = 0;
+        computerWin[i] = 0;
     }
 })
 
@@ -117,13 +211,13 @@ function createChessBoard() {
  * @param y     棋子y轴像素位置
  * @param c     bool类型,用来区别玩家，显示不同颜色棋子
  */
-function playChess(x, y, c) {
+function playChess(x, y) {
     ctx.save();
     ctx.beginPath();
-    ctx.arc(x, y, 25, 0, 2 * Math.PI);
-    var chessstyle = ctx.createRadialGradient(x, y, 25, x, y, 1);
-    /* c true 为黑子*/
-    if (c == 0) {
+    ctx.arc(x, y, 24.5, 0, 2 * Math.PI);
+    var chessstyle = ctx.createRadialGradient(x, y, 24.5, x, y, 1);
+    /* chesstype true 为黑子*/
+    if (player === 0) {
         chessstyle.addColorStop(0, "#0A0A0A");
         chessstyle.addColorStop(1, "#636766");
     } else {
@@ -144,7 +238,6 @@ function playChess(x, y, c) {
 function reset(x, y) {
     ctx.save();
     ctx.beginPath();
-    //通过画一个与背景色一样的圆将棋子掩盖
     ctx.arc(x, y, 25.5, 0, 2 * Math.PI);
     ctx.fillStyle = "#963";
     ctx.strokeStyle = "#963";
@@ -153,24 +246,25 @@ function reset(x, y) {
     ctx.restore();
     reset2(x, y);
 }
+
 /**
  * 悔棋用 棋盘轴恢复
  * @param x     棋子x轴像素位置
  * @param y     棋子y轴像素位置
  */
 function reset2(x, y) {
-    let x1 = x - 24.7,
-        x2 = x + 24.7,
-        y1 = y - 24.7,
-        y2 = y + 24.7;
+    let x1 = x - 25.6,
+        x2 = x + 25.6,
+        y1 = y - 25.6,
+        y2 = y + 25.6;
 
-    if (x == 1 * 50)
+    if (x === 50)
         x1 = x;
-    if (x == 15 * 50)
+    if (x === 15 * 50)
         x2 = x;
-    if (y == 1 * 50)
+    if (y === 50)
         y1 = y;
-    if (y == 15 * 50)
+    if (y === 15 * 50)
         y2 = y;
 
     ctx.beginPath();
@@ -187,37 +281,90 @@ function reset2(x, y) {
  * AI回合
  */
 function aiGo() {
-    if (over)
+    if (over) {
         return;
-    let xx, yy, x, y;
+    }
+    var xx, yy;
     //寻找最优位置[xx,yy]
+    let manOfValue = []; //玩家赢的权值
+    let computerOfValue = []; //电脑赢的权值
+    var max = 0;
+    for (x = 0; x < 15; x++) {
+        manOfValue[x] = [];
+        computerOfValue[x] = [];
+        for (y = 0; y < 15; y++) {
+            manOfValue[x][y] = 0;
+            computerOfValue[x][y] = 0;
+        }
+    }
+    for (x = 0; x < 15; x++) {
+        for (y = 0; y < 15; y++) {
+            if (chessBoard[x][y] === 0) { //查找空白棋
 
+                for (i = 0; i < count; i++) { //遍历count
+                    if (wins[x][y][i]) {
+                        if (manWin[i] === 1) {
+                            manOfValue[x][y] += 200;
+                        } //给予权值
+                        else if (manWin[i] === 2) {
+                            manOfValue[x][y] += 400;
+                        } else if (manWin[i] === 3) {
+                            manOfValue[x][y] += 2000;
+                        } else if (manWin[i] === 4) {
+                            manOfValue[x][y] += 10000;
+                        }
+
+                        if (computerWin[i] === 1) {
+                            computerOfValue[x][y] += 220;
+                        } //电脑相同条件权值要比玩家高，主要还是自己赢
+                        else if (computerWin[i] === 2) {
+                            computerOfValue[x][y] += 420;
+                        } else if (computerWin[i] === 3) {
+                            computerOfValue[x][y] += 2200;
+                        } else if (computerWin[i] === 4) {
+                            computerOfValue[x][y] += 20000;
+                        }
+                    }
+                }
+
+
+                if (manOfValue[x][y] > max) { //寻找最大权值
+                    max = manOfValue[x][y];
+                    xx = x;
+                    yy = y;
+                }
+                if (computerOfValue[x][y] > max) {
+                    max = computerOfValue[x][y];
+                    xx = x;
+                    yy = y;
+                }
+
+
+            }
+        }
+    }
     //获取像素坐标 xx = y - 1, yy = x - 1;
     x = yy + 1;
     y = xx + 1;
-
+    chessBoard[xx][yy] = 2;
+    record.push([xx, yy]);
+    playChess(x * 50, y * 50);
     //在最优位置下棋：调用playChess(x * 50, y * 50, player)显示 并且置棋盘数组对应位置为2 并记录下棋点record.push([xx, yy]);
 
-    //调用ifAIWin()判断电脑是否获胜
+    //判断输赢
+    for (var i = 0; i < count; i++) { //遍历赢法
 
-    //如果获胜，输出提示，并置over = true
-
-    //如果未获胜 交换棋权player ^= 1
-
-}
-
-/**
- * 判断玩家是否获胜
- * @returns bool
- */
-function ifPlayerWin() {
-
-}
-
-/**
- * 判断电脑是否获胜
- * @returns bool
- */
-function ifAIWin() {
-
+        if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数加一
+            computerWin[i]++;
+            if (manWin[i] !== 6) {
+                record2man[i] = manWin[i]; //将玩家的下棋记录中的这个点的值下来，方便悔棋
+            }
+            manWin[i] = 6; //玩家不可能再用这种赢法获胜了，将其置为非法值
+        }
+        if (computerWin[i] === 5) {
+            over = true; //为五，赢了
+            alert("AI赢了");
+        }
+    }
+    player ^= 1; //交换棋手
 }

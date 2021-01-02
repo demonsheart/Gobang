@@ -16,7 +16,7 @@ var record = []; //记录数组 记录下棋点的顺序 玩家电脑都要记�
 var record2cp = []; //记录覆盖，用于悔棋
 var record2man = []; //
 var count = 0; //（x，y）在的赢法种类
-var wins = [];
+var wins = []; //赢法数组，记录所有五子连成一线的情况
 var manWin = []; //玩家赢法数组
 var computerWin = []; //电脑赢法数组
 
@@ -49,7 +49,6 @@ for (i = 0; i < 15; i++) { //定义三维数组
         wins[i][j] = [];
     }
 }
-
 //横线能赢情况
 for (var x = 0; x < 11; x++) {
     for (var y = 0; y < 15; y++) {
@@ -61,7 +60,6 @@ for (var x = 0; x < 11; x++) {
         count += 2; //(x,y)在另一个赢法中
     }
 }
-
 for (x = 0; x < 11; x++) {
     //正斜线
     for (y = 0; y < 11; y++) {
@@ -84,6 +82,9 @@ for (i = 0; i < count; i++) {
     computerWin[i] = 0;
 }
 
+/**
+ * 下棋事件
+ */
 canv.addEventListener('click', function (ev) { //向画布添加点击事件(DOM事件)
     if (over)
         return;
@@ -91,7 +92,6 @@ canv.addEventListener('click', function (ev) { //向画布添加点击事件(DOM
     //当前坐标与行距的比值四舍五入 再回乘行距即可
     let x = Math.round(ev.offsetX / 50),
         y = Math.round(ev.offsetY / 50);
-
     //边框修正 重复值修正
     if (x * y > 0 && x < 16 && y < 16 && chessBoard[y - 1][x - 1] === 0) {
         let xx = y - 1,
@@ -100,7 +100,6 @@ canv.addEventListener('click', function (ev) { //向画布添加点击事件(DOM
         chessBoard[xx][yy] = 1;
         record.push([xx, yy]);
         playChess(x * 50, y * 50); //显示
-
         //判断输赢
         for (var i = 0; i < count; i++) { //遍历赢法
 
@@ -138,7 +137,7 @@ undo.addEventListener('click', function () {
 
             if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数减一
                 computerWin[i]--;
-                if (manWin[i] === 6) { //将玩家这个点的记录恢复
+                if (manWin[i] >= 6) { //将玩家这个点的记录恢复
                     manWin[i] = record2man[i];
                 }
             }
@@ -155,7 +154,7 @@ undo.addEventListener('click', function () {
         for (i = 0; i < count; i++) { //遍历赢法
             if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数减一
                 manWin[i]--;
-                if (computerWin[i] === 6) { //将电脑这个点的记录恢复
+                if (computerWin[i] >= 6) { //将电脑这个点的记录恢复
                     computerWin[i] = record2cp[i];
                 }
             }
@@ -165,6 +164,10 @@ undo.addEventListener('click', function () {
         over = false;
     }
 })
+
+/**
+ * 重新开始事件
+ */
 restart.addEventListener('click', function () {
     canv.height = 800; //清空canv(重新设置高度会重绘画布)
     createChessBoard(); //重绘
@@ -209,7 +212,6 @@ function createChessBoard() {
  * 绘制棋子
  * @param x     棋子x轴像素位置
  * @param y     棋子y轴像素位置
- * @param c     bool类型,用来区别玩家，显示不同颜色棋子
  */
 function playChess(x, y) {
     ctx.save();

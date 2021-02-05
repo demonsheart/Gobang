@@ -16,7 +16,7 @@ var record = []; //记录数组 记录下棋点的顺序 玩家电脑都要记�
 var record2cp = []; //记录覆盖，用于悔棋
 var record2man = []; //
 var count = 0; //（x，y）在的赢法种类
-var wins = []; //赢法数组，记录所有五子连成一线的情况
+var wins = [];//赢法数组，记录所有五子连成一线的情况
 var manWin = []; //玩家赢法数组
 var computerWin = []; //电脑赢法数组
 
@@ -105,7 +105,7 @@ canv.addEventListener('click', function (ev) { //向画布添加点击事件(DOM
 
             if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数加一
                 manWin[i]++;
-                if (computerWin[i] !== 6) {
+                if (computerWin[i] < 6) {
                     record2cp[i] = computerWin[i]; //将电脑的下棋记录中的这个点的值下来，方便悔棋
                 }
                 computerWin[i] = 6; //电脑不可能再用这种赢法获胜了，将其置为非法值
@@ -126,6 +126,10 @@ canv.addEventListener('click', function (ev) { //向画布添加点击事件(DOM
  */
 
 undo.addEventListener('click', function () {
+    if (over){
+        alert("胜负已分，不能撤回");
+        return;
+    }
     //由于下棋事件中包括了 玩家、电脑 故记录数应是偶数
     if (record.length > 0) {
         let xy = record.pop(); //会先将电脑的棋悔掉
@@ -176,6 +180,7 @@ restart.addEventListener('click', function () {
     record2man = [];
     manWin = [];
     computerWin = [];
+    player = 0;
     for (var i = 0; i < 15; i++) {
         chessBoard[i] = [];
         for (var j = 0; j < 15; j++) {
@@ -299,36 +304,38 @@ function aiGo() {
             computerOfValue[x][y] = 0;
         }
     }
+    if(chessBoard[7][7]===0)
+        computerOfValue[7][7]+= 300;
     for (x = 0; x < 15; x++) {
         for (y = 0; y < 15; y++) {
             if (chessBoard[x][y] === 0) { //查找空白棋
 
                 for (i = 0; i < count; i++) { //遍历count
-                    if (wins[x][y][i]) {
-                        if (manWin[i] === 1) {
-                            manOfValue[x][y] += 200;
+                    if (wins[x][y][i])
+                    {
+                        if (manWin[i] === 4) {
+                            manOfValue[x][y] += 18000;
                         } //给予权值
-                        else if (manWin[i] === 2) {
-                            manOfValue[x][y] += 400;
-                        } else if (manWin[i] === 3) {
-                            manOfValue[x][y] += 2000;
-                        } else if (manWin[i] === 4) {
+                        else if (manWin[i] === 3) {
                             manOfValue[x][y] += 10000;
+                        } else if (manWin[i] === 2) {
+                            manOfValue[x][y] += 400;
+                        } else if (manWin[i] === 1) {
+                            manOfValue[x][y] += 10;
                         }
 
-                        if (computerWin[i] === 1) {
-                            computerOfValue[x][y] += 220;
+                        if (computerWin[i] === 4) {
+                            computerOfValue[x][y] += 19000;
                         } //电脑相同条件权值要比玩家高，主要还是自己赢
-                        else if (computerWin[i] === 2) {
-                            computerOfValue[x][y] += 420;
-                        } else if (computerWin[i] === 3) {
-                            computerOfValue[x][y] += 2200;
-                        } else if (computerWin[i] === 4) {
-                            computerOfValue[x][y] += 20000;
+                        else if (computerWin[i] === 3) {
+                            computerOfValue[x][y] += 12000;
+                        } else if (computerWin[i] === 2) {
+                            computerOfValue[x][y] += 460;
+                        } else if (computerWin[i] === 1) {
+                            computerOfValue[x][y] += 12;
                         }
                     }
                 }
-
 
                 if (manOfValue[x][y] > max) { //寻找最大权值
                     max = manOfValue[x][y];
@@ -340,8 +347,7 @@ function aiGo() {
                     xx = x;
                     yy = y;
                 }
-
-
+                console.log(max);
             }
         }
     }
@@ -358,7 +364,7 @@ function aiGo() {
 
         if (wins[xx][yy][i]) { //（x，y）在赢法i上 该赢法将赢数加一
             computerWin[i]++;
-            if (manWin[i] !== 6) {
+            if (manWin[i] < 6) {
                 record2man[i] = manWin[i]; //将玩家的下棋记录中的这个点的值下来，方便悔棋
             }
             manWin[i] = 6; //玩家不可能再用这种赢法获胜了，将其置为非法值
